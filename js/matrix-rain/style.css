@@ -1,0 +1,78 @@
+html {
+    box-sizing: border-box;
+}
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: inherit;
+}
+body {
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: black;
+    overflow: hidden;
+}
+
+.screen {
+    position: relative;
+    height: calc(100vh - 100px);
+    width: calc(100vw - 100px);
+    overflow: hidden;
+    border: 1px solid green;
+    box-shadow: 0 0 50px 50px rgba(0, 50, 0, 1);
+}
+
+.char {
+    --x: 0;
+    --y: 0;
+    --delay: 0;
+    display: block;
+    position: absolute;
+    font-size:16px;
+    font-weight: bold;
+    color: green;
+    font-family: 'Courier New', Courier, monospace;
+    top: calc(var(--y) * 1px);
+    left: calc(var(--x) * 1px);
+    animation: fall 3s linear forwards, fade 3s linear forwards;
+}
+
+@keyframes fall {
+    from {
+        top: calc(var(--y) * 1px);
+    }
+    to {
+        top: calc((var(--y) * 1px) + 100vh);
+    }
+}
+
+@keyframes fade {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+#inspector {
+    position: absolute;
+    bottom: 10px;
+    right: 50px;
+    height: 30px;
+    color: green;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 16px;
+    line-height: 30px;
+    padding-inline: 10px;
+    text-align: right;
+    background: #000000;
+    border: 1px solid green;
+    font-weight: bold;
+}
+
