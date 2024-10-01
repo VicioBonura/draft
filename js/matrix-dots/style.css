@@ -16,6 +16,7 @@ body {
     align-items: center;
     background-color: black;
     overflow: hidden;
+    padding-bottom: 30px;
 }
 
 .screen {
@@ -47,12 +48,14 @@ body {
     text-align: center;
     line-height: calc(var(--h) * 1px);
     color: #009900;
-    background-color: #007700;
+    background-color: rgb(0,127,0);
     opacity: 0;
     border: 0px solid black;
 }
 
 .on {
+    --rgb: 0,127,0;
+    background-color: rgb(var(--rgb));
     opacity: 1;
     transition: opacity 0.3s linear;
 }
@@ -71,19 +74,19 @@ body {
     }
 }
 #inspector {
-    position: absolute;
-    bottom: 10px;
-    left: 50%;
-    transform: translateX(-50%);
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
     height: 30px;
     color: green;
     font-family: 'Courier New', Courier, monospace;
     font-size: 16px;
     line-height: 30px;
     padding-inline: 10px;
-    text-align: right;
+    text-align: left;
     background: #000000;
-    border: 1px solid green;
+    border-top: 1px solid green;
     font-weight: bold;
 }
 
