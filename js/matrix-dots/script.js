@@ -9,11 +9,11 @@ const config = {
     iterations: 0,
     rgbRange: {
         rMin: 0,
-        rMax: 0,
+        rMax: 255,
         gMin: 0,
         gMax: 255,
         bMin: 0,
-        bMax: 0
+        bMax: 255
     },
     init(size, interval, limit = 0) {
         this.iteractionLimit = limit;
@@ -77,9 +77,9 @@ function createDots() {
 
 /**
  * Drop the dots from the top to the bottom of the screen
+ * @param {Number} delay the delay between each dot drop
  */
-function drop() {
-    const delay = 0.5 / 10;
+function drop(delay) {
     const col = getNextCoord('col', true, true);
     for(let i = 0; i < config.rows; i++) {
         let dot = document.getElementById(`dot-${col}-${i}`);
@@ -90,7 +90,7 @@ function drop() {
     updateInspector(true, false, true, false, false);
     
     matrix.activeCols.length !== config.cols 
-        ? setTimeout(() => drop(), config.interval) 
+        ? setTimeout(() => drop(delay), config.interval) 
         : console.log('done');
 }
 
@@ -213,8 +213,10 @@ function updateInspector(showMatrix = true, showRows = false, showCols = false, 
 }
 
 /* initialize */
-config.init(15, 100);
+config.init(90, 100);
 
 /* run */
 createDots();
-wave(); // Replace randomSwitch() with wave()
+//drop(0.03);
+randomSwitch();
+//wave();

@@ -56,6 +56,7 @@ body {
 .on {
     --rgb: 0,127,0;
     background-color: rgb(var(--rgb));
+    color: hsl(from rgb(var(--rgb)) h 50% 33%);
     opacity: 1;
 }
 
