@@ -1,3 +1,5 @@
+/* constants */
+
 const screen = document.querySelector('.screen');
 const inspector = document.getElementById('inspector');
 
@@ -9,6 +11,14 @@ const config = {
     chars: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%^&*()_+-=[]{}|;:,.<>?~',
     idLength: 10,
     iterations: 0,
+    rgbRange: {
+        rMin: 0,
+        rMax: 255,
+        gMin: 0,
+        gMax: 255,
+        bMin: 0,
+        bMax: 255
+    },
 
     init(size, interval) {
         this.dotSize = size;
@@ -32,19 +42,7 @@ const matrix = {
     dotOff: 0 
 };
 
-/**
- * draw the matrix of dots in the screen element
- */
-function createDots() {
-    const fragment = document.createDocumentFragment();
-    for (let i = 0; i < matrix.cols; i++) {
-        for (let j = 0; j < matrix.rows; j++) {
-            const dot = createDot(i, j);
-            fragment.appendChild(dot);
-        }
-    }
-    screen.appendChild(fragment);
-}
+/* drawing functions */
 
 /**
  * Create a dot element
@@ -62,54 +60,22 @@ function createDot(i, j, char = false) {
         '--w': config.dotSize,
         '--h': config.dotSize
     }).forEach(([prop, value]) => dot.style.setProperty(prop, value));
-    if(char) dot.textContent = config.chars.charAt(Math.floor(Math.random() * config.chars.length));
+    if(char) dot.textContent = config.chars.charAt(getRandomInt(0, config.chars.length - 1));
     return dot;
 }
 
 /**
- * Get the next coordinate to work with
- * @param {Array} matrix the array containing the matrix data: [cols, rows, activeCols, activeRows]
- * @param {String} axis the axis to work with: 'col' or 'row'
- * @param {Boolean} random if true, return a random coordinate, otherwise return the next coordinate in the sequence
- * @param {Boolean} unique if true, return a coordinate that has not been used yet. It works only for random selection.
- * @returns the index of the coordinate to work with
+ * draw the matrix of dots in the screen element
  */
-function getNextCoord(matrix, axis, random = true, unique = true) {
-    let index;
-    const limit = axis === 'col' ? matrix.cols : matrix.rows;
-    const used = axis === 'col' ? matrix.activeCols : matrix.activeRows;
-
-    if (random) {
-        do index = Math.floor(Math.random() * limit);
-        while (unique && used.includes(index));
-    } else {
-        index = used.length;
+function createDots() {
+    const fragment = document.createDocumentFragment();
+    for (let i = 0; i < matrix.cols; i++) {
+        for (let j = 0; j < matrix.rows; j++) {
+            const dot = createDot(i, j);
+            fragment.appendChild(dot);
+        }
     }
-    if(!used.includes(index)) used.push(index);
-    return index;
-}
-
-/**
- * Update the inspector with the matrix data
- * @param {Array} matrix the array containing the matrix data: [cols, rows, activeCols, activeRows, dotOn, dotOff]
- * @param {Boolean} showMatrix if true, show the matrix size
- * @param {Boolean} showRows if true, show the number of active rows
- * @param {Boolean} showCols if true, show the number of active columns
- * @param {Boolean} showDots if true, show the number of dots
- * @param {Boolean} showActive if true, show the number of active dots
- */
-function updateInspector(matrix, showMatrix = true, showRows = false, showCols = false, showDots = false, showActive = false) {
-    let text = '';
-    if (showMatrix) text += `matrix: ${config.cols}x${config.rows} | `;
-    if (showRows) text += `rows: ${matrix.activeRows.length}/${config.rows} | `;
-    if (showCols) text += `cols: ${matrix.activeCols.length}/${config.cols} | `;
-    if (showDots) text += `dots: ${document.querySelectorAll('.dot').length} | `;
-    if (showActive) {
-        const percentage = (matrix.dotOn / (matrix.dotOn + matrix.dotOff) * 100).toFixed(2);
-        text += `dotOn: ${matrix.dotOn} | dotOff: ${matrix.dotOff} | ${percentage}% | `;
-    }
-    text += `STEP: ${config.iterations}`;
-    inspector.textContent = text;
+    screen.appendChild(fragment);
 }
 
 /**
@@ -133,12 +99,12 @@ function drop(matrix) {
 }
 
 /**
- * Switch the dot on or off
+ * Switch the dot on or off, with random color value
  * @param {Object} dot the dot to switch
  */
 function switchDot(dot) {
-    let opacity = Math.random();
-    dot.style.setProperty('--o', opacity);
+    let rgb = `${getRandomInt(config.rgbRange.rMin, config.rgbRange.rMax)}, ${getRandomInt(config.rgbRange.gMin, config.rgbRange.gMax)}, ${getRandomInt(config.rgbRange.bMin, config.rgbRange.bMax)}`;
+    dot.style.setProperty('--rgb', rgb);
     dot.classList.toggle('on');
     dot.classList.contains('on') ? (matrix.dotOn++, matrix.dotOff--) : (matrix.dotOn--, matrix.dotOff++);
 }
@@ -157,11 +123,69 @@ function randomSwitch(matrix) {
     setTimeout(() => randomSwitch(matrix), config.interval);
 }
 
+/* utils functions */
+
+/**
+ * Get the next coordinate to work with
+ * @param {Array} matrix the array containing the matrix data: [cols, rows, activeCols, activeRows]
+ * @param {String} axis the axis to work with: 'col' or 'row'
+ * @param {Boolean} random if true, return a random coordinate, otherwise return the next coordinate in the sequence
+ * @param {Boolean} unique if true, return a coordinate that has not been used yet. It works only for random selection.
+ * @returns the index of the coordinate to work with
+ */
+function getNextCoord(matrix, axis, random = true, unique = true) {
+    let index;
+    const limit = axis === 'col' ? matrix.cols : matrix.rows;
+    const used = axis === 'col' ? matrix.activeCols : matrix.activeRows;
+
+    if (random) {
+        do index = getRandomInt(0, limit - 1);
+        while (unique && used.includes(index));
+    } else index = used.length; 
+    if(!used.includes(index)) used.push(index);
+    return index;
+}
+
+/**
+ * Return a random integer between min and max
+ * @param {Number} min the minimum value
+ * @param {Number} max the maximum value
+ * @returns random integer
+ */
+function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 /**
  * Count the iterations
  */
 function countIterations() {
     config.iterations++;
+}
+
+/* monitoring functions */
+
+/**
+ * Update the inspector with the matrix data
+ * @param {Array} matrix the array containing the matrix data: [cols, rows, activeCols, activeRows, dotOn, dotOff]
+ * @param {Boolean} showMatrix if true, show the matrix size
+ * @param {Boolean} showRows if true, show the number of active rows
+ * @param {Boolean} showCols if true, show the number of active columns
+ * @param {Boolean} showDots if true, show the number of dots
+ * @param {Boolean} showActive if true, show the number of active dots
+ */
+function updateInspector(matrix, showMatrix = true, showRows = false, showCols = false, showDots = false, showActive = false) {
+    let text = '';
+    if (showMatrix) text += `matrix: ${config.cols}x${config.rows} | `;
+    if (showRows) text += `rows: ${matrix.activeRows.length}/${config.rows} | `;
+    if (showCols) text += `cols: ${matrix.activeCols.length}/${config.cols} | `;
+    if (showDots) text += `dots: ${document.querySelectorAll('.dot').length} | `;
+    if (showActive) {
+        const percentage = (matrix.dotOn / (matrix.dotOn + matrix.dotOff) * 100).toFixed(2);
+        text += `ON: ${matrix.dotOn} | OFF: ${matrix.dotOff} | ${percentage}% | `;
+    }
+    text += `STEPS: ${config.iterations}`;
+    inspector.textContent = text;
 }
 
 /* initialize */
