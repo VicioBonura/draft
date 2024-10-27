@@ -213,10 +213,10 @@ function updateInspector(showMatrix = true, showRows = false, showCols = false, 
 }
 
 /* initialize */
-config.init(90, 100);
+config.init(50, 100);
 
 /* run */
 createDots();
 //drop(0.03);
-randomSwitch();
-//wave();
+//randomSwitch();
+wave();
